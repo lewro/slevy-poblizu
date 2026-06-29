@@ -1,0 +1,322 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap");
+
+:root {
+  --bg: #15130f;
+  --surface: #211e18;
+  --surface-2: #2a261f;
+  --line: #3a352c;
+  --ink: #f5f0e8;
+  --ink-muted: #a89e8d;
+  --amber: #e8732c;
+  --amber-soft: #f0a06b;
+  --green: #5fbf77;
+  --radius: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+#__next,
+main {
+  height: 100%;
+}
+
+h1,
+h2,
+h3,
+.display {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: var(--amber-soft);
+}
+
+/* ---------- App shell ---------- */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+}
+
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: max(12px, env(safe-area-inset-top)) 14px 12px;
+  background: linear-gradient(to bottom, rgba(21, 19, 15, 0.92), rgba(21, 19, 15, 0));
+  pointer-events: none;
+}
+
+.topbar > * {
+  pointer-events: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.brand .display {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.brand .eyebrow {
+  font-size: 11px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink-muted);
+}
+
+.status-pill.live {
+  color: var(--green);
+  border-color: rgba(95, 191, 119, 0.35);
+}
+
+.status-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-pill.live .dot {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.map-wrap {
+  flex: 1;
+  position: relative;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+}
+
+/* Leaflet dark tweaks */
+.leaflet-container {
+  background: #1a1812;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+
+.leaflet-popup-tip {
+  background: var(--surface);
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.leaflet-popup-content b {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+}
+
+.leaflet-control-zoom a {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+.venue-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--amber);
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  border: 2px solid #1a1812;
+}
+
+.venue-pin span {
+  transform: rotate(45deg);
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1812;
+}
+
+.venue-pin.in-range {
+  background: var(--green);
+}
+
+.user-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #5b9cf0;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 4px rgba(91, 156, 240, 0.25);
+}
+
+/* ---------- Bottom controls ---------- */
+
+.bottombar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  padding: 12px 14px max(14px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(21, 19, 15, 0.95), rgba(21, 19, 15, 0));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-card {
+  background: var(--surface);
+  border: 1px solid rgba(95, 191, 119, 0.4);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.alert-card .badge {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(95, 191, 119, 0.15);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.alert-card .body {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-card .title {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0 0 2px;
+}
+
+.alert-card .desc {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn.primary {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #1a1812;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+}
+
+.toast {
+  position: absolute;
+  bottom: max(90px, calc(90px + env(safe-area-inset-bottom)));
+  left: 14px;
+  right: 14px;
+  z-index: 600;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  text-align: center;
+}

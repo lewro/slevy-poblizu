@@ -1,0 +1,17 @@
+{
+  "name": "Slevy poblíž",
+  "short_name": "Slevy poblíž",
+  "description": "Mapa slevových voucherů a upozornění, když jste blízko podniku se slevou.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#15130F",
+  "theme_color": "#E8732C",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
