@@ -47,6 +47,42 @@ function buildPopupHtml(v) {
   </div>`;
 }
 
+function buildGroupPopupHtml(group) {
+  if (group.length === 1) return buildPopupHtml(group[0]);
+
+  const address = group[0].address || "";
+  const items = group.map(v => {
+    const pct = v.discount_pct ?? calcPct(v.price, v.original_price);
+    const priceHtml = v.price
+      ? `<span style="font-size:14px;color:#000">${v.price} Kč</span>
+         ${v.original_price ? `&nbsp;<s style="font-size:12px;color:#bbb">${v.original_price} Kč</s>` : ""}
+         ${pct ? `&nbsp;<span style="font-size:12px;color:#22c55e">-${pct}%</span>` : ""}`
+      : "";
+    return `<div style="padding:14px 0;border-bottom:1px solid #f0f0f0">
+      <div style="font-size:13px;color:#000;line-height:1.35;margin-bottom:4px">${v.name}</div>
+      ${v.offer ? `<div style="font-size:11px;color:#888;margin-bottom:8px;line-height:1.4">${v.offer}</div>` : ""}
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div>${priceHtml}</div>
+        <a href="${affiliateUrl(v)}" target="_blank" rel="noopener"
+          style="flex-shrink:0;padding:7px 14px;background:#000;color:#fff;border-radius:100px;
+                 font-size:11px;font-weight:400;text-decoration:none;white-space:nowrap">
+          Koupit
+        </a>
+      </div>
+    </div>`;
+  }).join("");
+
+  return `<div style="min-width:260px;max-width:300px">
+    <div style="padding:20px 16px 0;padding-top:44px">
+      <div style="font-size:12px;font-weight:400;color:#22c55e;margin-bottom:2px">${group.length} nabídky na stejném místě</div>
+      ${address ? `<div style="font-size:12px;color:#888;margin-bottom:0">${address}</div>` : ""}
+    </div>
+    <div style="padding:0 16px 16px;max-height:55vh;overflow-y:auto">
+      ${items}
+    </div>
+  </div>`;
+}
+
 export default function MapView() {
   const mapElRef          = useRef(null);
   const mapRef            = useRef(null);
@@ -120,48 +156,66 @@ export default function MapView() {
       .or(`valid_until.is.null,valid_until.gte.${today}`)
       .limit(600);
 
-    if (selectedRawRef.current) {
-      query = query.in("category", selectedRawRef.current);
-    }
+    if (selectedRawRef.current) query = query.in("category", selectedRawRef.current);
 
     const { data } = await query;
     setLoading(false);
     if (!data) return;
 
+    // Merge all into venuesRef for proximity detection
     const existingIds = new Set(venuesRef.current.map(v => v.id));
     venuesRef.current = [...venuesRef.current, ...data.filter(v => !existingIds.has(v.id))];
 
+    // Group offers by location (round to 4 decimals ≈ 11m precision)
+    const groups = {};
     for (const v of data) {
-      if (markersRef.current[v.id]) continue;
-      const pct = v.discount_pct ?? calcPct(v.price, v.original_price);
-      const shortName = v.name?.slice(0, 20) ?? "";
+      const key = `${v.lat.toFixed(4)},${v.lng.toFixed(4)}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(v);
+    }
+
+    for (const [locKey, group] of Object.entries(groups)) {
+      if (markersRef.current[locKey]) continue; // already rendered
+
+      const { lat, lng } = group[0];
+      const count = group.length;
+
+      // Best discount in group
+      const bestPct = group.reduce((best, v) => {
+        const p = v.discount_pct ?? calcPct(v.price, v.original_price);
+        return p != null && p > best ? p : best;
+      }, 0);
+
+      const labelHtml = count > 1
+        ? `<span class="pin-pct">${count}×</span><span class="pin-name">${group[0].name?.slice(0, 18) ?? ""}</span>`
+        : `${bestPct ? `<span class="pin-pct">-${bestPct}%</span>` : ""}<span class="pin-name">${group[0].name?.slice(0, 20) ?? ""}</span>`;
+
+      const pinId = `pin-${locKey.replace(",", "_").replace(".", "_").replace(".", "_")}`;
+
       const icon = L.divIcon({
         className: "",
-        html: `<div class="venue-pin" id="pin-${v.id}">
-          <div class="pin-label">
-            ${pct != null ? `<span class="pin-pct">-${pct}%</span>` : ""}
-            <span class="pin-name">${shortName}</span>
-          </div>
+        html: `<div class="venue-pin" id="${pinId}">
+          <div class="pin-label">${labelHtml}</div>
           <div class="pin-dot"></div>
         </div>`,
         iconSize: [160, 48],
         iconAnchor: [80, 48],
         popupAnchor: [0, -34],
       });
-      const marker = L.marker([v.lat, v.lng], { icon }).addTo(map);
-      marker.bindPopup(buildPopupHtml(v), { maxWidth: 300, minWidth: 240 });
 
-      // Hide pin-label when popup is open (use visibility so dot doesn't move)
+      const marker = L.marker([lat, lng], { icon }).addTo(map);
+      marker.bindPopup(buildGroupPopupHtml(group), { maxWidth: 300, minWidth: 260 });
+
       marker.on("popupopen", () => {
-        const label = document.querySelector(`#pin-${v.id} .pin-label`);
+        const label = document.querySelector(`#${pinId} .pin-label`);
         if (label) label.style.visibility = "hidden";
       });
       marker.on("popupclose", () => {
-        const label = document.querySelector(`#pin-${v.id} .pin-label`);
+        const label = document.querySelector(`#${pinId} .pin-label`);
         if (label) label.style.visibility = "";
       });
 
-      markersRef.current[v.id] = marker;
+      markersRef.current[locKey] = marker;
     }
   }, [today]);
 
