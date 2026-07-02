@@ -1,12 +1,12 @@
 {
-  "name": "Slevy poblíž",
-  "short_name": "Slevy poblíž",
-  "description": "Mapa slevových voucherů a upozornění, když jste blízko podniku se slevou.",
+  "name": "Za rohem",
+  "short_name": "Za rohem",
+  "description": "Mapa slevových voucherů — kavárny, restaurace a zážitky poblíž tebe.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#15130F",
-  "theme_color": "#E8732C",
+  "background_color": "#15130f",
+  "theme_color": "#15130f",
   "orientation": "portrait-primary",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

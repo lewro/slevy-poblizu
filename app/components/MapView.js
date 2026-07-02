@@ -183,9 +183,11 @@ export default function MapView() {
       delete L.Icon.Default.prototype._getIconUrl;
       lRef.current = L;
 
-      map = L.map(mapElRef.current, { zoomControl: true, attributionControl: false })
+      map = L.map(mapElRef.current, { zoomControl: false, attributionControl: false })
               .setView([50.0784, 14.4424], 13);
       mapRef.current = map;
+
+      L.control.zoom({ position: "topright" }).addTo(map);
 
       L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -309,7 +311,7 @@ export default function MapView() {
   return (
     <div className="app">
       <div className="topbar">
-        <div className="brand"><span className="display">Slevy poblíž</span></div>
+        <div className="brand"><span className="display">Za rohem</span></div>
         {showInstall && (
           <button className="install-btn" onClick={handleInstall}>
             ⊕ Přidat aplikaci

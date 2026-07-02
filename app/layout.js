@@ -1,13 +1,10 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Slevy poblíž",
-  description: "Mapa slevových voucherů a upozornění, když jste blízko podniku se slevou.",
+  title: "Za rohem",
+  description: "Mapa slevových voucherů — kavárny, restaurace a zážitky poblíž tebe.",
   manifest: "/manifest.json",
-  icons: {
-    icon: "/favicon.png",
-    apple: "/icons/icon-192.png",
-  },
+  icons: { icon: "/favicon.png", apple: "/icons/icon-192.png" },
 };
 
 export const viewport = {
