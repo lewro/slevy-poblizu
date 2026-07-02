@@ -174,7 +174,7 @@ export default function MapView() {
           pos => {
             if (!zoomedToUserRef.current) {
               zoomedToUserRef.current = true;
-              map.setView([pos.coords.latitude, pos.coords.longitude], 16, { animate: true });
+              map.setView([pos.coords.latitude, pos.coords.longitude], 19, { animate: true });
             }
           },
           () => {},
@@ -202,7 +202,7 @@ export default function MapView() {
     // High-accuracy zoom (from watchPosition, more precise than getCurrentPosition)
     if (!zoomedToUserRef.current) {
       zoomedToUserRef.current = true;
-      map.setView([latitude, longitude], 16, { animate: true });
+      map.setView([latitude, longitude], 19, { animate: true });
     }
 
     if (!userMarkerRef.current) {
