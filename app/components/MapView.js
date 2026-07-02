@@ -94,6 +94,7 @@ export default function MapView() {
   const venuesRef         = useRef([]);
   const zoomedToUserRef   = useRef(false);
   const selectedRawRef    = useRef(RESTAURANT_RAW);
+  const userPositionRef   = useRef(null);
 
   const [tracking,      setTracking]      = useState(false);
   const [loading,       setLoading]       = useState(false);
@@ -287,6 +288,7 @@ export default function MapView() {
     const watchId = navigator.geolocation.watchPosition(
       pos => {
         const { latitude, longitude, accuracy } = pos.coords;
+        userPositionRef.current = { lat: latitude, lng: longitude };
         const map = mapRef.current;
         const L   = lRef.current;
         if (!map || !L) return;
@@ -321,6 +323,13 @@ export default function MapView() {
 
     return () => navigator.geolocation.clearWatch(watchId);
   }, [markPinInRange]);
+
+  const centerOnUser = () => {
+    const map = mapRef.current;
+    const pos = userPositionRef.current;
+    if (!map || !pos) return;
+    map.setView([pos.lat, pos.lng], 19, { animate: true });
+  };
 
   // ── Filter helpers ──
   const openFilter = () => {
@@ -365,7 +374,7 @@ export default function MapView() {
   return (
     <div className="app">
       <div className="topbar">
-        <div className="brand"><span className="display">Za rohem</span></div>
+        <img src="/icons/icon.svg" className="topbar-icon" alt="Za rohem" />
         {showInstall && (
           <button className="install-btn" onClick={handleInstall}>
             ⊕ Přidat aplikaci
@@ -376,6 +385,9 @@ export default function MapView() {
       <div className="map-wrap">
         <div id="map" ref={mapElRef} />
         {loading && <div className="map-loading">Načítám nabídky…</div>}
+        <button className="center-btn" onClick={centerOnUser} title="Zpět na moji polohu">
+          ◎
+        </button>
       </div>
 
       <div className="bottombar">
