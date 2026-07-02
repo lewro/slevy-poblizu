@@ -5,13 +5,19 @@ export const metadata = {
   description: "Mapa slevových voucherů — kavárny, restaurace a zážitky poblíž tebe.",
   manifest: "/manifest.json",
   icons: { icon: "/favicon.png", apple: "/icons/icon-192.png" },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "apple-mobile-web-app-title": "Za rohem",
+  },
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#22c55e",
+  themeColor: "#000000",
   viewportFit: "cover",
 };
 
