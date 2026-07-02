@@ -108,18 +108,14 @@ export default function MapView() {
 
   // PWA install prompt
   useEffect(() => {
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-    if (isStandalone) return; // already installed
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+      || navigator.standalone === true;
+    if (isStandalone) return;
+    setShowInstall(true); // always show the button when not installed
 
-    if (isIOS) {
-      setShowInstall(true); // always show on iOS (no beforeinstallprompt)
-      return;
-    }
     const handler = e => {
       e.preventDefault();
-      setInstallPrompt(e);
-      setShowInstall(true);
+      setInstallPrompt(e); // native prompt available
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
@@ -128,11 +124,18 @@ export default function MapView() {
   const handleInstall = async () => {
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     if (isIOS) { setShowIOS(true); return; }
-    if (!installPrompt) return;
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === "accepted") setShowInstall(false);
-    setInstallPrompt(null);
+
+    if (installPrompt) {
+      // Native Chrome prompt available — use it
+      installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      if (outcome === "accepted") setShowInstall(false);
+      setInstallPrompt(null);
+    } else {
+      // No native prompt (cooldown after uninstall, or criteria not met)
+      // Show manual instructions
+      setShowIOS(true); // reuse the overlay, content updated below
+    }
   };
 
   // Load categories
@@ -401,10 +404,22 @@ export default function MapView() {
       {showIOS && (
         <div className="ios-overlay" onClick={() => setShowIOS(false)}>
           <div className="ios-sheet" onClick={e => e.stopPropagation()}>
-            <h3>Přidat na plochu</h3>
-            <p>1. Klepněte na tlačítko <strong>Sdílet</strong> (čtvereček se šipkou nahoru) v Safari.</p>
-            <p>2. Přejděte dolů a vyberte <strong>Přidat na plochu</strong>.</p>
-            <p>3. Potvrďte klepnutím na <strong>Přidat</strong> vpravo nahoře.</p>
+            {/iphone|ipad|ipod/i.test(typeof navigator !== "undefined" ? navigator.userAgent : "") ? (
+              <>
+                <h3>Přidat na plochu (iOS)</h3>
+                <p>1. Klepněte na <strong>Sdílet</strong> (čtvereček se šipkou) v Safari.</p>
+                <p>2. Vyberte <strong>Přidat na plochu</strong>.</p>
+                <p>3. Potvrďte klepnutím na <strong>Přidat</strong>.</p>
+              </>
+            ) : (
+              <>
+                <h3>Přidat na plochu (Android)</h3>
+                <p>Chrome dočasně blokuje automatickou instalaci. Přidejte appku ručně:</p>
+                <p>1. Klepněte na menu <strong>⋮</strong> vpravo nahoře v Chromu.</p>
+                <p>2. Vyberte <strong>Přidat na plochu</strong> nebo <strong>Nainstalovat aplikaci</strong>.</p>
+                <p>3. Potvrďte.</p>
+              </>
+            )}
             <button className="ios-close" onClick={() => setShowIOS(false)}>Rozumím</button>
           </div>
         </div>
