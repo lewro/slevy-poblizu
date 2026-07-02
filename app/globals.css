@@ -42,7 +42,7 @@ button { font-family: inherit; font-weight: 400; cursor: pointer; }
 #map { position: absolute; inset: 0; background: var(--bg); }
 
 /* ── Leaflet ── */
-.leaflet-container { background: #1a1812; font-family: "Inter", system-ui, sans-serif; }
+.leaflet-container { background: #f5f3f0; font-family: "Inter", system-ui, sans-serif; }
 .leaflet-popup-content { margin: 0 !important; }
 .leaflet-popup-content-wrapper {
   background: #fff; color: #000;
