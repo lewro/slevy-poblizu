@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import "leaflet/dist/leaflet.css";
-import { distanceMeters, formatDistance } from "../../lib/geo";
+import { distanceMeters } from "../../lib/geo";
 import { supabase } from "../../lib/supabase";
 
 const ALERT_RADIUS_M = 350;
@@ -57,10 +57,9 @@ export default function MapView() {
   const lastAlertedRef    = useRef({});
   const venuesRef         = useRef([]);
   const zoomedToUserRef   = useRef(false);
-  const selectedRawRef    = useRef(RESTAURANT_RAW); // raw DB values for current filter
+  const selectedRawRef    = useRef(RESTAURANT_RAW);
 
   const [tracking,      setTracking]      = useState(false);
-  const [nearbyVenue,   setNearbyVenue]   = useState(null);
   const [loading,       setLoading]       = useState(false);
   const [showFilter,    setShowFilter]    = useState(false);
   const [allCategories, setAllCategories] = useState([]);
@@ -120,14 +119,14 @@ export default function MapView() {
       const marker = L.marker([v.lat, v.lng], { icon }).addTo(map);
       marker.bindPopup(buildPopupHtml(v), { maxWidth: 300, minWidth: 240 });
 
-      // Hide pin-label when popup is open (avoid duplicity)
+      // Hide pin-label when popup is open (use visibility so dot doesn't move)
       marker.on("popupopen", () => {
         const label = document.querySelector(`#pin-${v.id} .pin-label`);
-        if (label) label.style.display = "none";
+        if (label) label.style.visibility = "hidden";
       });
       marker.on("popupclose", () => {
         const label = document.querySelector(`#pin-${v.id} .pin-label`);
-        if (label) label.style.display = "";
+        if (label) label.style.visibility = "";
       });
 
       markersRef.current[v.id] = marker;
@@ -141,7 +140,6 @@ export default function MapView() {
     Object.values(markersRef.current).forEach(m => map.removeLayer(m));
     markersRef.current = {};
     venuesRef.current  = [];
-    setNearbyVenue(null);
     refreshMarkers(map, L);
   }, [refreshMarkers]);
 
@@ -226,10 +224,8 @@ export default function MapView() {
         let closest = null;
         for (const v of venuesRef.current) {
           const d = distanceMeters(latitude, longitude, v.lat, v.lng);
-          markPinInRange(v.id, d <= ALERT_RADIUS_M);
           if (d <= ALERT_RADIUS_M && (!closest || d < closest.distance)) closest = { ...v, distance: d };
         }
-        setNearbyVenue(closest);
       },
       () => setTracking(false),
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
@@ -290,17 +286,7 @@ export default function MapView() {
       </div>
 
       <div className="bottombar">
-        {nearbyVenue && (
-          <a className="alert-card" href={affiliateUrl(nearbyVenue)} target="_blank" rel="noopener">
-            <div className="badge">{nearbyVenue.discount_pct ?? calcPct(nearbyVenue.price, nearbyVenue.original_price) ?? "?"}%</div>
-            <div className="body">
-              <p className="title">{nearbyVenue.name}</p>
-              <p className="desc">{nearbyVenue.offer} · {formatDistance(nearbyVenue.distance)}</p>
-            </div>
-            <div style={{ fontSize: 16, color: "var(--green)", flexShrink: 0 }}>→</div>
-          </a>
-        )}
-        <div className="actions-row">
+      <div className="actions-row">
           <button className={`btn filter ${activeCats ? "active" : ""}`} onClick={openFilter}>
             ⊞ {filterLabel}
           </button>
