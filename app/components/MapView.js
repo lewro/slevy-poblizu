@@ -64,7 +64,39 @@ export default function MapView() {
   const [showFilter,    setShowFilter]    = useState(false);
   const [allCategories, setAllCategories] = useState([]);
   const [pendingCats,   setPendingCats]   = useState(new Set(["Restaurace a bary"]));
-  const [activeCats,    setActiveCats]    = useState(["Restaurace a bary"]); // normalized names
+  const [activeCats,    setActiveCats]    = useState(["Restaurace a bary"]);
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [showInstall,   setShowInstall]   = useState(false);
+  const [showIOS,       setShowIOS]       = useState(false); // normalized names
+
+  // PWA install prompt
+  useEffect(() => {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+    if (isStandalone) return; // already installed
+
+    if (isIOS) {
+      setShowInstall(true); // always show on iOS (no beforeinstallprompt)
+      return;
+    }
+    const handler = e => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      setShowInstall(true);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS) { setShowIOS(true); return; }
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") setShowInstall(false);
+    setInstallPrompt(null);
+  };
 
   // Load categories
   useEffect(() => {
@@ -112,9 +144,9 @@ export default function MapView() {
           </div>
           <div class="pin-dot"></div>
         </div>`,
-        iconSize: [160, 50],
-        iconAnchor: [80, 50],
-        popupAnchor: [0, -52],
+        iconSize: [160, 48],
+        iconAnchor: [80, 48],
+        popupAnchor: [0, -34],
       });
       const marker = L.marker([v.lat, v.lng], { icon }).addTo(map);
       marker.bindPopup(buildPopupHtml(v), { maxWidth: 300, minWidth: 240 });
@@ -151,7 +183,7 @@ export default function MapView() {
       delete L.Icon.Default.prototype._getIconUrl;
       lRef.current = L;
 
-      map = L.map(mapElRef.current, { zoomControl: true, attributionControl: true })
+      map = L.map(mapElRef.current, { zoomControl: true, attributionControl: false })
               .setView([50.0784, 14.4424], 13);
       mapRef.current = map;
 
@@ -278,6 +310,11 @@ export default function MapView() {
     <div className="app">
       <div className="topbar">
         <div className="brand"><span className="display">Slevy poblíž</span></div>
+        {showInstall && (
+          <button className="install-btn" onClick={handleInstall}>
+            ⊕ Přidat aplikaci
+          </button>
+        )}
       </div>
 
       <div className="map-wrap">
@@ -293,8 +330,19 @@ export default function MapView() {
         </div>
       </div>
 
-      {showFilter && (
-        <div className="filter-overlay" onClick={() => setShowFilter(false)}>
+      {showIOS && (
+        <div className="ios-overlay" onClick={() => setShowIOS(false)}>
+          <div className="ios-sheet" onClick={e => e.stopPropagation()}>
+            <h3>Přidat na plochu</h3>
+            <p>1. Klepněte na tlačítko <strong>Sdílet</strong> (čtvereček se šipkou nahoru) v Safari.</p>
+            <p>2. Přejděte dolů a vyberte <strong>Přidat na plochu</strong>.</p>
+            <p>3. Potvrďte klepnutím na <strong>Přidat</strong> vpravo nahoře.</p>
+            <button className="ios-close" onClick={() => setShowIOS(false)}>Rozumím</button>
+          </div>
+        </div>
+      )}
+
+      {showFilter && (        <div className="filter-overlay" onClick={() => setShowFilter(false)}>
           <div className="filter-sheet" onClick={e => e.stopPropagation()}>
             <div className="filter-handle" />
             <div className="filter-head">
