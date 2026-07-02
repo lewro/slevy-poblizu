@@ -142,6 +142,59 @@ button { font-family: inherit; font-weight: 400; cursor: pointer; }
 .btn.filter.active { background: #fff; border-color: #000; color: #000; border-width: 2px; }
 .btn:active { transform: scale(0.97); }
 
+/* ── Search button (topbar left) ── */
+.search-btn {
+  position: absolute; left: 14px;
+  background: none; border: none; color: #fff;
+  font-size: 16px; cursor: pointer; padding: 6px;
+  line-height: 1; pointer-events: auto;
+}
+
+/* ── Search overlay + panel ── */
+.search-overlay {
+  position: absolute; inset: 0; z-index: 900;
+  background: rgba(0,0,0,0.4);
+}
+.search-panel {
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+  animation: slideDown 0.18s ease;
+}
+@keyframes slideDown { from{transform:translateY(-100%)} to{transform:translateY(0)} }
+
+.search-input-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px;
+  padding-top: calc(12px + env(safe-area-inset-top));
+  border-bottom: 1px solid #eee;
+}
+.search-icon-inner { font-size: 14px; color: #999; flex-shrink: 0; }
+.search-input {
+  flex: 1; border: none; outline: none;
+  font-size: 15px; font-weight: 400; color: #000;
+  background: transparent; font-family: inherit;
+}
+.search-input::placeholder { color: #aaa; }
+.search-close {
+  background: #f0f0f0; border: none; border-radius: 50%;
+  width: 28px; height: 28px; font-size: 14px; color: #555;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+
+.search-status {
+  padding: 14px 16px; font-size: 13px; color: #999; text-align: center;
+}
+.search-results { max-height: 50vh; overflow-y: auto; }
+.search-result-item {
+  padding: 13px 16px; border-bottom: 1px solid #f0f0f0;
+  cursor: pointer; display: flex; flex-direction: column; gap: 2px;
+}
+.search-result-item:active { background: #f9f9f9; }
+.result-name { font-size: 14px; color: #000; font-weight: 400; }
+.result-sub  { font-size: 12px; color: #999; }
+
 /* ── Install button (topbar, absolute right) ── */
 .install-btn {
   pointer-events: auto;

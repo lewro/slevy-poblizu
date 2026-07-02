@@ -104,7 +104,11 @@ export default function MapView() {
   const [activeCats,    setActiveCats]    = useState(["Restaurace a bary"]);
   const [installPrompt, setInstallPrompt] = useState(null);
   const [showInstall,   setShowInstall]   = useState(false);
-  const [showIOS,       setShowIOS]       = useState(false); // normalized names
+  const [showIOS,       setShowIOS]       = useState(false);
+  const [showSearch,    setShowSearch]    = useState(false);
+  const [searchQuery,   setSearchQuery]   = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching,     setSearching]     = useState(false); // normalized names
 
   // PWA install prompt
   useEffect(() => {
@@ -327,6 +331,42 @@ export default function MapView() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, [markPinInRange]);
 
+  const searchTimer = useRef(null);
+
+  const doSearch = async (q) => {
+    if (!q.trim()) { setSearchResults([]); return; }
+    setSearching(true);
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=cz,sk&limit=6&addressdetails=1`;
+      const res = await fetch(url, { headers: { "User-Agent": "ZaRohem/1.0" } });
+      const data = await res.json();
+      setSearchResults(data);
+    } catch (e) { /* ignore */ }
+    setSearching(false);
+  };
+
+  const onSearchInput = (e) => {
+    const q = e.target.value;
+    setSearchQuery(q);
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => doSearch(q), 350);
+  };
+
+  const selectResult = (result) => {
+    const lat = parseFloat(result.lat);
+    const lng = parseFloat(result.lon);
+    if (mapRef.current) mapRef.current.setView([lat, lng], 16, { animate: true });
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
+  const closeSearch = () => {
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
   const centerOnUser = () => {
     const map = mapRef.current;
     const pos = userPositionRef.current;
@@ -377,6 +417,7 @@ export default function MapView() {
   return (
     <div className="app">
       <div className="topbar">
+        <button className="search-btn" onClick={() => setShowSearch(true)}>🔍</button>
         <img src="/icons/icon.svg" className="topbar-icon" alt="Za rohem" />
         {showInstall && (
           <button className="install-btn" onClick={handleInstall}>
@@ -384,6 +425,39 @@ export default function MapView() {
           </button>
         )}
       </div>
+
+      {showSearch && (
+        <div className="search-overlay" onClick={closeSearch}>
+          <div className="search-panel" onClick={e => e.stopPropagation()}>
+            <div className="search-input-row">
+              <span className="search-icon-inner">🔍</span>
+              <input
+                className="search-input"
+                autoFocus
+                placeholder="Hledat ulici nebo místo…"
+                value={searchQuery}
+                onChange={onSearchInput}
+                onKeyDown={e => e.key === "Escape" && closeSearch()}
+              />
+              <button className="search-close" onClick={closeSearch}>✕</button>
+            </div>
+            {searching && <div className="search-status">Hledám…</div>}
+            {!searching && searchResults.length > 0 && (
+              <div className="search-results">
+                {searchResults.map((r, i) => (
+                  <div key={i} className="search-result-item" onClick={() => selectResult(r)}>
+                    <span className="result-name">{r.display_name.split(",")[0]}</span>
+                    <span className="result-sub">{r.display_name.split(",").slice(1, 3).join(",").trim()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {!searching && searchQuery.length > 1 && searchResults.length === 0 && (
+              <div className="search-status">Nic nenalezeno</div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="map-wrap">
         <div id="map" ref={mapElRef} />
