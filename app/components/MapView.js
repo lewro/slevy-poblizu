@@ -31,7 +31,7 @@ function buildPopupHtml(v) {
     ? `<div style="margin-bottom:14px">
         <span style="font-size:16px;font-weight:700;color:#000">${v.price} Kč</span>
         ${v.original_price
-          ? `&nbsp;<s style="font-size:13px;color:#bbb">${v.original_price} Kč</s>&nbsp;<span style="font-size:13px;font-weight:700;color:#e8732c">-${pct}%</span>`
+          ? `&nbsp;<s style="font-size:13px;color:#bbb">${v.original_price} Kč</s>&nbsp;<span style="font-size:13px;font-weight:700;color:#22c55e">-${pct}%</span>`
           : ""}
        </div>` : "";
   const validHtml = v.valid_until
@@ -174,7 +174,7 @@ export default function MapView() {
           pos => {
             if (!zoomedToUserRef.current) {
               zoomedToUserRef.current = true;
-              map.setView([pos.coords.latitude, pos.coords.longitude], 14, { animate: true });
+              map.setView([pos.coords.latitude, pos.coords.longitude], 16, { animate: true });
             }
           },
           () => {},
@@ -202,7 +202,7 @@ export default function MapView() {
     // High-accuracy zoom (from watchPosition, more precise than getCurrentPosition)
     if (!zoomedToUserRef.current) {
       zoomedToUserRef.current = true;
-      map.setView([latitude, longitude], 14, { animate: true });
+      map.setView([latitude, longitude], 16, { animate: true });
     }
 
     if (!userMarkerRef.current) {
