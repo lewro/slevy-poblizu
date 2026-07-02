@@ -301,7 +301,7 @@ export default function MapView() {
             const icon = L.divIcon({ className: "", html: '<div class="user-dot"></div>', iconSize: [16, 16] });
             userMarkerRef.current     = L.marker([latitude, longitude], { icon, zIndexOffset: 1000 }).addTo(map);
             accuracyCircleRef.current = L.circle([latitude, longitude], {
-              radius: accuracy, color: "#5b9cf0", weight: 1, fillOpacity: 0.08,
+              radius: accuracy, color: "#ef4444", weight: 1, fillOpacity: 0.08,
             }).addTo(map);
           } else {
             userMarkerRef.current.setLatLng([latitude, longitude]);
