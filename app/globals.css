@@ -35,7 +35,7 @@ button { font-family: inherit; font-weight: 400; cursor: pointer; }
 .topbar-icon {
   width: 24px; height: 24px;
   display: block;
-  /* icon is black on transparent — no invert needed on white bar */
+  filter: invert(1);
 }
 
 /* ── Map ── */
