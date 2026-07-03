@@ -26,10 +26,10 @@ button { font-family: inherit; font-weight: 400; cursor: pointer; }
 
 .topbar {
   position: absolute; top: 0; left: 0; right: 0; z-index: 500;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
-  height: calc(44px + env(safe-area-inset-top));
+  height: calc(56px + env(safe-area-inset-top));
   padding-top: env(safe-area-inset-top);
 }
 .topbar-icon {
@@ -211,7 +211,7 @@ button { font-family: inherit; font-weight: 400; cursor: pointer; }
 .install-btn:active { transform: scale(0.96); }
 
 /* Zoom control: top-right, below topbar, 40×40 */
-.leaflet-top.leaflet-right { top: calc(44px + env(safe-area-inset-top) + 10px); right: 14px; }
+.leaflet-top.leaflet-right { top: calc(56px + env(safe-area-inset-top) + 10px); right: 14px; }
 .leaflet-control-zoom a {
   width: 40px !important; height: 40px !important;
   line-height: 40px !important; font-size: 18px !important;
