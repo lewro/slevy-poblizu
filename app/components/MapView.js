@@ -417,7 +417,12 @@ export default function MapView() {
   return (
     <div className="app">
       <div className="topbar">
-        <button className="search-btn" onClick={() => setShowSearch(true)}>🔍</button>
+        <button className="search-btn" onClick={() => setShowSearch(true)}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round">
+            <circle cx="6.5" cy="6.5" r="5"/>
+            <line x1="10.5" y1="10.5" x2="15" y2="15"/>
+          </svg>
+        </button>
         <img src="/icons/icon.svg" className="topbar-icon" alt="Za rohem" />
         {showInstall && (
           <button className="install-btn" onClick={handleInstall}>
@@ -430,7 +435,11 @@ export default function MapView() {
         <div className="search-overlay" onClick={closeSearch}>
           <div className="search-panel" onClick={e => e.stopPropagation()}>
             <div className="search-input-row">
-              <span className="search-icon-inner">🔍</span>
+              <span className="search-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#aaa" strokeWidth="1" strokeLinecap="round">
+                  <circle cx="6.5" cy="6.5" r="5"/><line x1="10.5" y1="10.5" x2="15" y2="15"/>
+                </svg>
+              </span>
               <input
                 className="search-input"
                 autoFocus
