@@ -25,13 +25,18 @@ function calcPct(price, original) {
   return Math.round(((original - price) / original) * 100);
 }
 
+function currency(v) {
+  return v.source === "slevomat-sk" ? "€" : "Kč";
+}
+
 function buildPopupHtml(v) {
+  const cur = currency(v);
   const pct = v.discount_pct ?? calcPct(v.price, v.original_price);
   const priceHtml = v.price
     ? `<div style="margin-bottom:16px">
-        <span style="font-size:16px;font-weight:400;color:#000">${v.price} Kč</span>
+        <span style="font-size:16px;font-weight:400;color:#000">${v.price} ${cur}</span>
         ${v.original_price
-          ? `&nbsp;<s style="font-size:12px;color:#bbb;font-weight:400">${v.original_price} Kč</s>&nbsp;<span style="font-size:12px;color:#22c55e;font-weight:400">-${pct}%</span>`
+          ? `&nbsp;<s style="font-size:12px;color:#bbb;font-weight:400">${v.original_price} ${cur}</s>&nbsp;<span style="font-size:12px;color:#22c55e;font-weight:400">-${pct}%</span>`
           : ""}
       </div>` : "";
   return `<div style="padding:24px 16px;min-width:220px;max-width:280px;padding-top:44px">
@@ -52,10 +57,11 @@ function buildGroupPopupHtml(group) {
 
   const address = group[0].address || "";
   const items = group.map(v => {
+    const cur = currency(v);
     const pct = v.discount_pct ?? calcPct(v.price, v.original_price);
     const priceHtml = v.price
-      ? `<span style="font-size:14px;color:#000">${v.price} Kč</span>
-         ${v.original_price ? `&nbsp;<s style="font-size:12px;color:#bbb">${v.original_price} Kč</s>` : ""}
+      ? `<span style="font-size:14px;color:#000">${v.price} ${cur}</span>
+         ${v.original_price ? `&nbsp;<s style="font-size:12px;color:#bbb">${v.original_price} ${cur}</s>` : ""}
          ${pct ? `&nbsp;<span style="font-size:12px;color:#22c55e">-${pct}%</span>` : ""}`
       : "";
     return `<div style="padding:14px 0;border-bottom:1px solid #f0f0f0">
